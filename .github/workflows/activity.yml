@@ -1,0 +1,45 @@
+name: Green Squares Bot
+
+on:
+  schedule:
+    - cron: '0 12 * * *'    # 5:30 PM IST
+    - cron: '30 13 * * *'   # 7:00 PM IST
+    - cron: '0 15 * * *'    # 8:30 PM IST
+    - cron: '30 16 * * *'   # 10:00 PM IST
+    - cron: '0 18 * * *'    # 11:30 PM IST
+    - cron: '15 19 * * *'   # 12:45 AM IST
+  workflow_dispatch:
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pytz
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run commit script
+        run: python commit.py
+
+      - name: Push changes
+        run: |
+          git add .
+          git commit -m "Auto commit" || echo "No changes"
+          git push
